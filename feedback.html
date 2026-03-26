@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="color-scheme" content="light"/>
+  <title>Votre avis</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: #F5F5F7;
+      color: #1A1A1A;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+    .wrap { width: 100%; max-width: 420px; }
+
+    .card {
+      background: #FFFFFF;
+      border-radius: 20px;
+      border: 1.5px solid #111827;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+
+    .card-top { padding: 28px 24px 20px; }
+    .loom-eyebrow { font-size: 11px; font-weight: 600; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+    .loom-title { font-size: 21px; font-weight: 700; line-height: 1.3; letter-spacing: -0.3px; color: #111827; margin-bottom: 6px; }
+    .loom-meta { font-size: 13px; color: #9CA3AF; }
+
+    .sep { height: 1px; background: #F3F4F6; }
+
+    .card-question { padding: 22px 24px 20px; }
+    .question { font-size: 16px; font-weight: 600; color: #111827; margin-bottom: 16px; }
+
+    .vote-row { display: flex; gap: 10px; }
+    .vote-btn {
+      flex: 1;
+      padding: 14px 10px;
+      border: 1.5px solid #E5E7EB;
+      border-radius: 12px;
+      background: #FAFAFA;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      color: #374151;
+      font-family: 'Inter', sans-serif;
+      text-align: center;
+      transition: all 0.15s;
+    }
+    .vote-btn:hover { border-color: #111827; background: #F9FAFB; color: #111827; }
+    .vote-btn:active { transform: scale(0.97); }
+    .vote-btn.btn-pos:hover { border-color: #16A34A; background: #F0FDF4; color: #16A34A; }
+
+    .response-positive, .response-negative { display: none; animation: fadeUp 0.3s ease; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+    .msg-wrap { padding: 22px 24px 0; }
+    .msg-card { background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 14px; padding: 16px; margin-bottom: 16px; }
+    .msg-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .avatar { width: 32px; height: 32px; border-radius: 50%; background: #111827; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: white; flex-shrink: 0; }
+    .msg-meta { display: flex; flex-direction: column; }
+    .msg-name { font-size: 13px; font-weight: 600; color: #111827; }
+    .msg-time { font-size: 11px; color: #9CA3AF; }
+    .msg-text { font-size: 15px; line-height: 1.6; color: #374151; }
+
+    .calendly-wrap { padding: 0 24px 12px; }
+    .calendly-btn {
+      display: flex; align-items: center; justify-content: center;
+      width: 100%; padding: 15px;
+      background: #111827; color: #fff;
+      border: none; border-radius: 12px;
+      font-size: 15px; font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer; text-decoration: none;
+      transition: background 0.15s, transform 0.1s;
+      margin-bottom: 8px;
+    }
+    .calendly-btn:hover { background: #1F2937; }
+    .calendly-btn:active { transform: scale(0.98); }
+    .calendly-note { font-size: 12px; color: #9CA3AF; text-align: center; }
+
+    .undo-wrap { padding: 12px 24px 24px; text-align: center; }
+    .undo-btn { font-size: 13px; font-weight: 500; color: #9CA3AF; background: none; border: none; cursor: pointer; font-family: inherit; }
+    .undo-btn:hover { color: #111827; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <div class="card-top" id="card-top">
+      <div class="loom-title" id="loom-title-txt"></div>
+      <div class="loom-meta" id="loom-date-txt"></div>
+    </div>
+    <div class="sep" id="sep-top" style="display:none"></div>
+
+    <div class="card-question" id="vote-section">
+      <div class="question">Cette approche vous parle ?</div>
+      <div class="vote-row">
+        <button class="vote-btn btn-pos" onclick="vote('positive')">Je suis partant</button>
+        <button class="vote-btn" onclick="vote('negative')">Ce n'est pas le moment</button>
+      </div>
+    </div>
+
+    <div class="response-positive" id="response-positive">
+      <div class="msg-wrap">
+        <div class="msg-card">
+          <div class="msg-header">
+            <div class="avatar" id="avatar-pos">K</div>
+            <div class="msg-meta">
+              <span class="msg-name" id="sender-name-pos">Karl</span>
+              <span class="msg-time">À l'instant</span>
+            </div>
+          </div>
+          <div class="msg-text" id="human-msg-pos">Top, merci ! Je vous propose qu'on se parle 10 minutes pour voir si je peux vraiment vous aider. Choisissez le créneau qui vous convient</div>
+        </div>
+      </div>
+      <div class="calendly-wrap">
+        <a class="calendly-btn" id="calendly-link" href="VOTRE_LIEN_CALENDLY" target="_blank">Choisir un créneau</a>
+        <div class="calendly-note">Gratuit · 10 min · Annulable à tout moment</div>
+      </div>
+      <div class="undo-wrap"><button class="undo-btn" onclick="resetVote()">Modifier ma réponse</button></div>
+    </div>
+
+    <div class="response-negative" id="response-negative">
+      <div class="msg-wrap">
+        <div class="msg-card">
+          <div class="msg-header">
+            <div class="avatar" id="avatar-neg">K</div>
+            <div class="msg-meta">
+              <span class="msg-name" id="sender-name-neg">Karl</span>
+              <span class="msg-time">À l'instant</span>
+            </div>
+          </div>
+          <div class="msg-text">Pas de souci, je comprends. Merci d'avoir pris le temps — bonne continuation à vous !</div>
+        </div>
+      </div>
+      <div class="undo-wrap"><button class="undo-btn" onclick="resetVote()">Modifier ma réponse</button></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const FORMSPREE        = "https://formspree.io/f/xqegkvaj";
+  const DEFAULT_SENDER   = "Karl";
+  const DEFAULT_CALENDLY = "https://calendly.com/votre-lien";
+  const DEFAULT_MSG_POS  = "Top, merci ! Je vous propose qu'on se parle 10 minutes pour voir si je peux vraiment vous aider. Choisissez le créneau qui vous convient";
+
+  const p         = new URLSearchParams(location.search);
+  const loomId    = p.get("loom")     || "";
+  const loomTitle = p.get("title")    ? decodeURIComponent(p.get("title"))    : "";
+  const prospect  = p.get("prospect") ? decodeURIComponent(p.get("prospect")) : "";
+  const sender    = p.get("sender")   ? decodeURIComponent(p.get("sender"))   : DEFAULT_SENDER;
+  const calendly  = p.get("calendly") ? decodeURIComponent(p.get("calendly")) : DEFAULT_CALENDLY;
+  const msgPos    = p.get("msg")      ? decodeURIComponent(p.get("msg"))      : DEFAULT_MSG_POS;
+
+  const viewKey  = "loom_views_" + (loomId || "demo");
+  const votedKey = "loom_voted_" + (loomId || "demo");
+
+  if (prospect || loomTitle) {
+    const title = prospect && loomTitle ? "Pour " + prospect + " — " + loomTitle
+                : prospect ? prospect : loomTitle;
+    document.getElementById("loom-title-txt").textContent = title;
+    document.getElementById("loom-date-txt").textContent  = "Reçu le " + new Date().toLocaleDateString("fr-FR", {day:"numeric",month:"long",year:"numeric"});
+    document.getElementById("sep-top").style.display = "block";
+  } else {
+    document.getElementById("card-top").style.display = "none";
+  }
+
+  document.getElementById("sender-name-pos").textContent = sender;
+  document.getElementById("sender-name-neg").textContent = sender;
+  document.getElementById("avatar-pos").textContent      = sender.charAt(0).toUpperCase();
+  document.getElementById("avatar-neg").textContent      = sender.charAt(0).toUpperCase();
+  document.getElementById("human-msg-pos").textContent   = msgPos;
+  document.getElementById("calendly-link").href          = calendly;
+
+  const views = parseInt(localStorage.getItem(viewKey) || "0") + 1;
+  localStorage.setItem(viewKey, views);
+
+  const prev = localStorage.getItem(votedKey);
+  if (prev) showResult(prev);
+
+  async function vote(type) {
+    localStorage.setItem(votedKey, type);
+    showResult(type);
+    try {
+      await fetch(FORMSPREE, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify({
+          prospect:  prospect || "Inconnu",
+          loom:      loomTitle || "—",
+          loom_id:   loomId   || "—",
+          vote:      type === "positive" ? "Je suis partant" : "Ce n'est pas le moment",
+          vues:      views,
+          date:      new Date().toLocaleDateString("fr-FR")
+        })
+      });
+    } catch(e) {}
+  }
+
+  function showResult(type) {
+    document.getElementById("vote-section").style.display      = "none";
+    document.getElementById("response-positive").style.display = type === "positive" ? "block" : "none";
+    document.getElementById("response-negative").style.display = type === "negative" ? "block" : "none";
+  }
+
+  function resetVote() {
+    localStorage.removeItem(votedKey);
+    document.getElementById("vote-section").style.display      = "block";
+    document.getElementById("response-positive").style.display = "none";
+    document.getElementById("response-negative").style.display = "none";
+  }
+</script>
+</body>
+</html>
