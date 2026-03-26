@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard LOOMs</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #f7f6f3;
+      --card: #ffffff;
+      --surf: #f0efe8;
+      --text: #1a1a18;
+      --muted: #6b6b67;
+      --hint: #9b9b96;
+      --border: rgba(0,0,0,0.1);
+      --border-md: rgba(0,0,0,0.18);
+      --radius: 12px;
+      --radius-sm: 8px;
+      --green: #3B6D11; --green-bg: #EAF3DE; --green-bd: #639922;
+      --red:   #791F1F; --red-bg:   #FCEBEB; --red-bd:   #A32D2D;
+      --blue:  #0C447C; --blue-bg:  #E6F1FB;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #141413; --card: #1e1e1c; --surf: #252523;
+        --text: #f0efe8; --muted: #a0a09a; --hint: #6b6b67;
+        --border: rgba(255,255,255,0.09); --border-md: rgba(255,255,255,0.16);
+        --green: #97C459; --green-bg: #173404; --green-bd: #3B6D11;
+        --red:   #F09595; --red-bg:   #501313; --red-bd:   #791F1F;
+        --blue:  #85B7EB; --blue-bg:  #042C53;
+      }
+    }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 2rem 1rem; }
+    .brand { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--hint); margin-bottom: 1.5rem; }
+
+    /* Lock screen */
+    #lock { display: flex; align-items: center; justify-content: center; min-height: 80vh; }
+    .lock-card { background: var(--card); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 2rem; max-width: 320px; width: 100%; text-align: center; }
+    .lock-icon { font-size: 28px; margin-bottom: 12px; }
+    .lock-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+    .lock-sub { font-size: 13px; color: var(--muted); margin-bottom: 1.5rem; line-height: 1.5; }
+    .lock-input { width: 100%; padding: 10px 12px; border: 0.5px solid var(--border-md); border-radius: var(--radius-sm); background: var(--bg); color: var(--text); font-size: 14px; text-align: center; margin-bottom: 10px; }
+    .lock-btn { width: 100%; padding: 10px; border: 0.5px solid var(--border-md); border-radius: var(--radius-sm); background: var(--card); color: var(--text); font-size: 14px; cursor: pointer; font-weight: 500; transition: background 0.15s; }
+    .lock-btn:hover { background: var(--surf); }
+    .lock-err { font-size: 12px; color: var(--red); margin-top: 8px; display: none; }
+
+    /* Dashboard */
+    #dash { display: none; max-width: 860px; margin: 0 auto; }
+    .dash-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1.5rem; gap: 12px; flex-wrap: wrap; }
+    .dash-title { font-size: 20px; font-weight: 600; }
+    .dash-sub { font-size: 13px; color: var(--muted); margin-top: 3px; }
+    .header-actions { display: flex; gap: 8px; }
+    .btn-sm { padding: 7px 14px; border: 0.5px solid var(--border-md); border-radius: var(--radius-sm); background: var(--card); color: var(--text); font-size: 13px; cursor: pointer; transition: background 0.15s; white-space: nowrap; }
+    .btn-sm:hover { background: var(--surf); }
+    .btn-sm.primary { background: var(--text); color: var(--bg); border-color: transparent; }
+    .btn-sm.primary:hover { opacity: 0.85; }
+
+    /* Métriques globales */
+    .metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
+    .metric { background: var(--surf); border-radius: var(--radius-sm); padding: 14px 16px; }
+    .metric-lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+    .metric-val { font-size: 22px; font-weight: 600; }
+    .metric-val.g { color: var(--green); }
+    .metric-val.r { color: var(--red); }
+
+    /* Ajout LOOM */
+    .add-card { background: var(--card); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1.25rem; }
+    .add-title { font-size: 13px; font-weight: 600; margin-bottom: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .add-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .add-input { flex: 1; min-width: 140px; padding: 8px 12px; border: 0.5px solid var(--border-md); border-radius: var(--radius-sm); background: var(--bg); color: var(--text); font-size: 13px; }
+    .add-btn { padding: 8px 16px; border: 0.5px solid var(--border-md); border-radius: var(--radius-sm); background: var(--card); color: var(--text); font-size: 13px; cursor: pointer; white-space: nowrap; font-weight: 500; transition: background 0.15s; }
+    .add-btn:hover { background: var(--surf); }
+
+    /* Tableau */
+    .table-card { background: var(--card); border: 0.5px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
+    th { padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; background: var(--surf); border-bottom: 0.5px solid var(--border); }
+    td { padding: 12px 14px; border-bottom: 0.5px solid var(--border); vertical-align: middle; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--surf); }
+
+    /* Barre de progression */
+    .bar-wrap { display: flex; align-items: center; gap: 7px; }
+    .bar-bg { flex: 1; height: 5px; background: var(--surf); border-radius: 3px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s; }
+
+    /* Pills */
+    .pill { display: inline-block; padding: 2px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+    .pill-g { background: var(--green-bg); color: var(--green); }
+    .pill-r { background: var(--red-bg);   color: var(--red); }
+    .pill-n { background: var(--surf);     color: var(--muted); }
+
+    /* Bouton copier lien */
+    .copy-btn { background: none; border: 0.5px solid var(--border); border-radius: 5px; padding: 3px 8px; font-size: 11px; color: var(--muted); cursor: pointer; transition: background 0.1s; }
+    .copy-btn:hover { background: var(--surf); }
+    .copy-btn.ok { color: var(--green); border-color: var(--green-bd); }
+
+    /* Vide */
+    .empty { text-align: center; padding: 3rem; color: var(--muted); font-size: 14px; }
+
+    @media (max-width: 600px) {
+      .metrics { grid-template-columns: 1fr 1fr; }
+      .metric-val { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="brand">Loom Tracker</div>
+
+<!-- Lock screen -->
+<div id="lock">
+  <div class="lock-card">
+    <div class="lock-icon">🔐</div>
+    <div class="lock-title">Dashboard privé</div>
+    <div class="lock-sub">Entrez votre code d'accès pour voir les statistiques de vos LOOMs.</div>
+    <input class="lock-input" type="password" id="pwd" placeholder="Code d'accès" onkeydown="if(event.key==='Enter')unlock()">
+    <button class="lock-btn" onclick="unlock()">Accéder au dashboard</button>
+    <div class="lock-err" id="lock-err">Code incorrect, réessayez.</div>
+  </div>
+</div>
+
+<!-- Dashboard -->
+<div id="dash">
+  <div class="dash-header">
+    <div>
+      <div class="dash-title">Dashboard LOOMs</div>
+      <div class="dash-sub" id="last-update"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-sm" onclick="loadAll()">↺ Actualiser</button>
+      <button class="btn-sm" onclick="logout()">Déconnexion</button>
+    </div>
+  </div>
+
+  <!-- Métriques globales -->
+  <div class="metrics">
+    <div class="metric"><div class="metric-lbl">LOOMs suivis</div><div class="metric-val" id="m-total">—</div></div>
+    <div class="metric"><div class="metric-lbl">Total vues</div><div class="metric-val" id="m-views">—</div></div>
+    <div class="metric"><div class="metric-lbl">Votes positifs</div><div class="metric-val g" id="m-pos">—</div></div>
+    <div class="metric"><div class="metric-lbl">Taux positif</div><div class="metric-val" id="m-rate">—</div></div>
+  </div>
+
+  <!-- Ajouter un LOOM -->
+  <div class="add-card">
+    <div class="add-title">Ajouter un LOOM</div>
+    <div class="add-row">
+      <input class="add-input" id="new-id"       placeholder="ID (ex: acme-corp-01)" />
+      <input class="add-input" id="new-title"    placeholder="Titre du LOOM" />
+      <input class="add-input" id="new-prospect" placeholder="Prénom prospect (optionnel)" />
+      <button class="add-btn" onclick="addLoom()">+ Ajouter</button>
+    </div>
+  </div>
+
+  <!-- Tableau -->
+  <div class="table-card">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:22%">Prospect / LOOM</th>
+          <th style="width:8%">Vues</th>
+          <th style="width:6%">👍</th>
+          <th style="width:6%">👎</th>
+          <th style="width:22%">Taux positif</th>
+          <th style="width:14%">Statut</th>
+          <th style="width:22%">Lien feedback</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  // ─── CONFIG ────────────────────────────────────────────
+  const PASSWORD      = "KarlTR";           // ← changez ce mot de passe
+  const FEEDBACK_PAGE = "feedback.html";      // ← nom du fichier feedback (même dossier)
+  const CALENDLY_URL  = "https://calendly.com/votre-lien"; // ← votre lien Calendly
+  const SENDER_NAME   = "Karl";       // ← Karl
+  // ───────────────────────────────────────────────────────
+
+  const LOOMS_KEY = "dashboard_looms_v2";
+
+  function unlock() {
+    if (document.getElementById("pwd").value === PASSWORD) {
+      document.getElementById("lock").style.display = "none";
+      document.getElementById("dash").style.display = "block";
+      sessionStorage.setItem("loom_auth", "1");
+      loadAll();
+    } else {
+      document.getElementById("lock-err").style.display = "block";
+    }
+  }
+  function logout() {
+    sessionStorage.removeItem("loom_auth");
+    location.reload();
+  }
+  if (sessionStorage.getItem("loom_auth")) {
+    document.getElementById("lock").style.display = "none";
+    document.getElementById("dash").style.display = "block";
+    loadAll();
+  }
+
+  function getLooms() {
+    const r = localStorage.getItem(LOOMS_KEY);
+    return r ? JSON.parse(r) : [
+      { id: "demo-001", title: "Démo produit", prospect: "Marie" }
+    ];
+  }
+  function saveLooms(list) { localStorage.setItem(LOOMS_KEY, JSON.stringify(list)); }
+
+  function addLoom() {
+    const id       = document.getElementById("new-id").value.trim();
+    const title    = document.getElementById("new-title").value.trim();
+    const prospect = document.getElementById("new-prospect").value.trim();
+    if (!id || !title) return;
+    const list = getLooms();
+    if (!list.find(l => l.id === id)) list.push({ id, title, prospect });
+    saveLooms(list);
+    document.getElementById("new-id").value = "";
+    document.getElementById("new-title").value = "";
+    document.getElementById("new-prospect").value = "";
+    loadAll();
+  }
+
+  function deleteLoom(id) {
+    saveLooms(getLooms().filter(l => l.id !== id));
+    loadAll();
+  }
+
+  function loadAll() {
+    const list = getLooms();
+    const tbody = document.getElementById("tbody");
+    tbody.innerHTML = "";
+
+    let tViews = 0, tPos = 0, tVotes = 0;
+
+    if (!list.length) {
+      tbody.innerHTML = '<tr><td colspan="7" class="empty">Aucun LOOM suivi. Ajoutez-en un ci-dessus.</td></tr>';
+    }
+
+    list.forEach(loom => {
+      const views = parseInt(localStorage.getItem("loom_views_" + loom.id) || "0");
+      const raw   = localStorage.getItem("loom_feedback_" + loom.id);
+      let pos = 0, neg = 0;
+      if (raw) { const d = JSON.parse(raw); pos = d.positive || 0; neg = d.negative || 0; }
+
+      tViews += views; tPos += pos; tVotes += (pos + neg);
+
+      const total = pos + neg;
+      const rate  = total > 0 ? Math.round(pos / total * 100) : null;
+      const rateStr = rate !== null ? rate + "%" : "—";
+      const pillCls = rate === null ? "pill-n" : rate >= 60 ? "pill-g" : "pill-r";
+      const barColor = rate !== null && rate < 50 ? "#E24B4A" : "#639922";
+      const barW = rate !== null ? rate : 0;
+
+      // Statut
+      let statut = '<span class="pill pill-n">En attente</span>';
+      const voted = localStorage.getItem("loom_voted_" + loom.id);
+      if (voted === "positive") statut = '<span class="pill pill-g">👍 Intéressé</span>';
+      else if (voted === "negative") statut = '<span class="pill pill-r">👎 Pas intéressé</span>';
+      else if (views > 0) statut = '<span class="pill pill-n">Vu, pas voté</span>';
+
+      // Lien feedback
+      const url = buildLink(loom);
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td style="font-weight:500" title="${loom.title}">
+          ${loom.prospect ? '<span style="color:var(--muted);font-size:11px">' + loom.prospect + '</span><br>' : ''}
+          ${loom.title}
+        </td>
+        <td>${views || "—"}</td>
+        <td>${pos || "—"}</td>
+        <td>${neg || "—"}</td>
+        <td>
+          <div class="bar-wrap">
+            <div class="bar-bg"><div class="bar-fill" style="width:${barW}%;background:${barColor}"></div></div>
+            <span class="pill ${pillCls}">${rateStr}</span>
+          </div>
+        </td>
+        <td>${statut}</td>
+        <td>
+          <button class="copy-btn" id="copy-${loom.id}" onclick="copyLink('${loom.id}')">Copier le lien</button>
+          &nbsp;
+          <button class="copy-btn" onclick="deleteLoom('${loom.id}')" style="color:var(--red)">Supprimer</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    document.getElementById("m-total").textContent  = list.length || "—";
+    document.getElementById("m-views").textContent  = tViews || "—";
+    document.getElementById("m-pos").textContent    = tPos || "—";
+    const rate = tVotes > 0 ? Math.round(tPos / tVotes * 100) + "%" : "—";
+    const rEl  = document.getElementById("m-rate");
+    rEl.textContent = rate;
+    rEl.className   = "metric-val" + (tVotes > 0 ? (tPos/tVotes >= 0.6 ? " g" : " r") : "");
+    document.getElementById("last-update").textContent =
+      "Mis à jour à " + new Date().toLocaleTimeString("fr-FR", {hour:"2-digit",minute:"2-digit"});
+  }
+
+  function buildLink(loom) {
+    const base = location.origin + location.pathname.replace("dashboard.html", FEEDBACK_PAGE);
+    const params = new URLSearchParams({
+      loom:     loom.id,
+      title:    loom.title,
+      sender:   SENDER_NAME,
+      calendly: CALENDLY_URL,
+    });
+    if (loom.prospect) params.set("prospect", loom.prospect);
+    return base + "?" + params.toString();
+  }
+
+  function copyLink(id) {
+    const loom = getLooms().find(l => l.id === id);
+    if (!loom) return;
+    navigator.clipboard.writeText(buildLink(loom)).then(() => {
+      const btn = document.getElementById("copy-" + id);
+      btn.textContent = "✓ Copié !";
+      btn.classList.add("ok");
+      setTimeout(() => { btn.textContent = "Copier le lien"; btn.classList.remove("ok"); }, 2000);
+    });
+  }
+</script>
+</body>
+</html>
