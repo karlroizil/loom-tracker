@@ -19,7 +19,6 @@
       padding: 2rem 1rem;
     }
     .wrap { width: 100%; max-width: 420px; }
-
     .card {
       background: #FFFFFF;
       border-radius: 20px;
@@ -27,17 +26,12 @@
       box-shadow: 0 4px 24px rgba(0,0,0,0.08);
       overflow: hidden;
     }
-
     .card-top { padding: 28px 24px 20px; }
-    .loom-eyebrow { font-size: 11px; font-weight: 600; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
     .loom-title { font-size: 21px; font-weight: 700; line-height: 1.3; letter-spacing: -0.3px; color: #111827; margin-bottom: 6px; }
     .loom-meta { font-size: 13px; color: #9CA3AF; }
-
     .sep { height: 1px; background: #F3F4F6; }
-
     .card-question { padding: 22px 24px 20px; }
     .question { font-size: 16px; font-weight: 600; color: #111827; margin-bottom: 16px; }
-
     .vote-row { display: flex; gap: 10px; }
     .vote-btn {
       flex: 1;
@@ -56,10 +50,8 @@
     .vote-btn:hover { border-color: #111827; background: #F9FAFB; color: #111827; }
     .vote-btn:active { transform: scale(0.97); }
     .vote-btn.btn-pos:hover { border-color: #16A34A; background: #F0FDF4; color: #16A34A; }
-
     .response-positive, .response-negative { display: none; animation: fadeUp 0.3s ease; }
     @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-
     .msg-wrap { padding: 22px 24px 0; }
     .msg-card { background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 14px; padding: 16px; margin-bottom: 16px; }
     .msg-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
@@ -68,7 +60,6 @@
     .msg-name { font-size: 13px; font-weight: 600; color: #111827; }
     .msg-time { font-size: 11px; color: #9CA3AF; }
     .msg-text { font-size: 15px; line-height: 1.6; color: #374151; }
-
     .calendly-wrap { padding: 0 24px 12px; }
     .calendly-btn {
       display: flex; align-items: center; justify-content: center;
@@ -84,7 +75,6 @@
     .calendly-btn:hover { background: #1F2937; }
     .calendly-btn:active { transform: scale(0.98); }
     .calendly-note { font-size: 12px; color: #9CA3AF; text-align: center; }
-
     .undo-wrap { padding: 12px 24px 24px; text-align: center; }
     .undo-btn { font-size: 13px; font-weight: 500; color: #9CA3AF; background: none; border: none; cursor: pointer; font-family: inherit; }
     .undo-btn:hover { color: #111827; }
@@ -121,7 +111,7 @@
         </div>
       </div>
       <div class="calendly-wrap">
-        <a class="calendly-btn" id="calendly-link" href="VOTRE_LIEN_CALENDLY" target="_blank">Choisir un créneau</a>
+        <a class="calendly-btn" id="calendly-link" href="https://calendly.com/votre-lien" target="_blank">Choisir un créneau</a>
         <div class="calendly-note">Gratuit · 10 min · Annulable à tout moment</div>
       </div>
       <div class="undo-wrap"><button class="undo-btn" onclick="resetVote()">Modifier ma réponse</button></div>
@@ -159,8 +149,8 @@
   const calendly  = p.get("calendly") ? decodeURIComponent(p.get("calendly")) : DEFAULT_CALENDLY;
   const msgPos    = p.get("msg")      ? decodeURIComponent(p.get("msg"))      : DEFAULT_MSG_POS;
 
-  const viewKey  = "loom_views_" + (loomId || "demo");
-  const votedKey = "loom_voted_" + (loomId || "demo");
+  const viewKey  = "loom_views_"  + (loomId || "demo");
+  const votedKey = "loom_voted_"  + (loomId || "demo");
 
   if (prospect || loomTitle) {
     const title = prospect && loomTitle ? "Pour " + prospect + " — " + loomTitle
@@ -203,6 +193,7 @@
     } catch(e) {
       console.error("Webhook error:", e);
     }
+  }
 
   function showResult(type) {
     document.getElementById("vote-section").style.display      = "none";
