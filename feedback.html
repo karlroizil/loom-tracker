@@ -195,14 +195,13 @@
         body: JSON.stringify({
   "Nom du prospect": prospect || "Inconnu",
   "Lien LOOM": "https://www.loom.com/share/" + (loomId || "-"),
-  "Métier à tisser Réponse": type === "positive" ? "Je suis partant" : "Ce n'est pas le moment",
+  "Réponse": type === "positive" ? "Je suis partant" : "Ce n'est pas le moment",
   "Vues": views,
   "Date": new Date().toLocaleDateString("fr-FR")
-})
-        })
-      });
-    } catch(e) {}
-  }
+});
+    } catch(e) {
+      console.error("Webhook error:", e);
+    }
 
   function showResult(type) {
     document.getElementById("vote-section").style.display      = "none";
