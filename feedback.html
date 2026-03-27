@@ -193,12 +193,12 @@
         method: "POST",
         headers: { "Content-Type": "application/json", "Accept": "application/json" },
         body: JSON.stringify({
-          prospect:  prospect || "Inconnu",
-          loom:      loomTitle || "—",
-          loom_id: "https://www.loom.com/share/" + (loomId || "-"),
-          vote: type === "positive" ? "Je suis partant" : "Ce n'est pas le moment",
-          vues:      views,
-          date:      new Date().toLocaleDateString("fr-FR")
+  "Nom du prospect": prospect || "Inconnu",
+  "Lien LOOM": "https://www.loom.com/share/" + (loomId || "-"),
+  "Métier à tisser Réponse": type === "positive" ? "Je suis partant" : "Ce n'est pas le moment",
+  "Vues": views,
+  "Date": new Date().toLocaleDateString("fr-FR")
+})
         })
       });
     } catch(e) {}
