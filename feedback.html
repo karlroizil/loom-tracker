@@ -193,12 +193,13 @@
         method: "POST",
         headers: { "Content-Type": "application/json", "Accept": "application/json" },
         body: JSON.stringify({
-  "Nom du prospect": prospect || "Inconnu",
-  "Lien LOOM": "https://www.loom.com/share/" + (loomId || "-"),
-  "Réponse": type === "positive" ? "Je suis partant" : "Ce n'est pas le moment",
-  "Vues": views,
-  "Date": new Date().toLocaleDateString("fr-FR")
-});
+          "Nom du prospect": prospect || "Inconnu",
+          "Lien LOOM": "https://www.loom.com/share/" + (loomId || "-"),
+          "Réponse": type === "positive" ? "Je suis partant" : "Ce n'est pas le moment",
+          "Vues": views,
+          "Date": new Date().toLocaleDateString("fr-FR")
+        })
+      });
     } catch(e) {
       console.error("Webhook error:", e);
     }
