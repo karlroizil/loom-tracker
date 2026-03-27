@@ -195,7 +195,7 @@
         body: JSON.stringify({
           prospect:  prospect || "Inconnu",
           loom:      loomTitle || "—",
-          loom_id: loomId || "-",
+          loom_id: "https://www.loom.com/share/" + (loomId || "-"),
           vote: type === "positive" ? "Je suis partant" : "Ce n'est pas le moment",
           vues:      views,
           date:      new Date().toLocaleDateString("fr-FR")
