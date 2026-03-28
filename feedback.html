@@ -10,7 +10,7 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     body {
       font-family: 'Inter', -apple-system, sans-serif;
-      background: #F5F5F7;
+      background: #E8ECF0;
       color: #1A1A1A;
       min-height: 100vh;
       display: flex;
@@ -18,70 +18,143 @@
       justify-content: center;
       padding: 2rem 1rem;
     }
-    .wrap { width: 100%; max-width: 420px; }
+    .wrap { width: 100%; max-width: 620px; }
+
+    /* Mac window chrome */
+    .mac-bar {
+      background: #D0D3D8;
+      padding: 10px 16px;
+      border-radius: 12px 12px 0 0;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      border: 1px solid #B8BCC4;
+      border-bottom: none;
+    }
+    .mac-dot { width: 12px; height: 12px; border-radius: 50%; }
+    .mac-dot.red    { background: #FF5F57; border: 1px solid #E0443E; }
+    .mac-dot.yellow { background: #FFBD2E; border: 1px solid #DEA123; }
+    .mac-dot.green  { background: #28C840; border: 1px solid #1DAD2B; }
+    .mac-title { flex: 1; text-align: center; font-size: 12px; font-weight: 500; color: #6B7280; margin-right: 38px; }
+
     .card {
       background: #FFFFFF;
-      border-radius: 20px;
-      border: 1.5px solid #111827;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      border-radius: 0 0 12px 12px;
+      border: 1px solid #B8BCC4;
+      border-top: none;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
       overflow: hidden;
     }
-    .card-top { padding: 28px 24px 20px; }
-    .loom-title { font-size: 21px; font-weight: 700; line-height: 1.3; letter-spacing: -0.3px; color: #111827; margin-bottom: 6px; }
-    .loom-meta { font-size: 13px; color: #9CA3AF; }
+    .card-top { padding: 24px 24px 16px; border-bottom: 1px solid #F3F4F6; }
+    .loom-title { font-size: 18px; font-weight: 700; line-height: 1.3; color: #111827; margin-bottom: 4px; }
+    .loom-meta { font-size: 12px; color: #9CA3AF; }
     .sep { height: 1px; background: #F3F4F6; }
-    .card-question { padding: 22px 24px 20px; }
-    .question { font-size: 16px; font-weight: 600; color: #111827; margin-bottom: 16px; }
+
+    .section { display: none; padding: 22px 24px 24px; animation: fadeUp 0.25s ease; }
+    .section.active { display: block; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+    .question { font-size: 16px; font-weight: 600; color: #111827; margin-bottom: 16px; line-height: 1.5; }
+    .sub { font-size: 12px; color: #9CA3AF; margin-bottom: 14px; margin-top: -10px; }
+
     .vote-row { display: flex; gap: 10px; }
     .vote-btn {
-      flex: 1;
-      padding: 14px 10px;
-      border: 1.5px solid #E5E7EB;
-      border-radius: 12px;
-      background: #FAFAFA;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 600;
-      color: #374151;
-      font-family: 'Inter', sans-serif;
-      text-align: center;
+      flex: 1; padding: 15px 10px;
+      border: 1.5px solid #E5E7EB; border-radius: 10px;
+      background: #FAFAFA; cursor: pointer;
+      font-size: 14px; font-weight: 600; color: #374151;
+      font-family: 'Inter', sans-serif; text-align: center;
       transition: all 0.15s;
     }
-    .vote-btn:hover { border-color: #111827; background: #F9FAFB; color: #111827; }
+    .vote-btn:hover { border-color: #2563EB; background: #EFF6FF; color: #2563EB; }
     .vote-btn:active { transform: scale(0.97); }
-    .vote-btn.btn-pos:hover { border-color: #16A34A; background: #F0FDF4; color: #16A34A; }
-    .response-positive, .response-negative { display: none; animation: fadeUp 0.3s ease; }
-    @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-    .msg-wrap { padding: 22px 24px 0; }
-    .msg-card { background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 14px; padding: 16px; margin-bottom: 16px; }
+    .vote-btn.btn-pos:hover { border-color: #2563EB; background: #EFF6FF; color: #2563EB; }
+    .vote-btn.btn-neg:hover { border-color: #6B7280; background: #F9FAFB; color: #374151; }
+
+    .choices { display: flex; flex-wrap: wrap; gap: 8px; }
+    .choice-btn {
+      padding: 11px 18px;
+      border: 1.5px solid #E5E7EB; border-radius: 8px;
+      background: #FAFAFA; cursor: pointer;
+      font-size: 13px; font-weight: 500; color: #374151;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.15s;
+    }
+    .choice-btn:hover { border-color: #2563EB; color: #2563EB; background: #EFF6FF; }
+    .choice-btn.selected { border-color: #2563EB; background: #2563EB; color: #fff; }
+
+    .multi-choices { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+    .multi-btn {
+      padding: 11px 18px;
+      border: 1.5px solid #E5E7EB; border-radius: 8px;
+      background: #FAFAFA; cursor: pointer;
+      font-size: 13px; font-weight: 500; color: #374151;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.15s;
+    }
+    .multi-btn:hover { border-color: #2563EB; color: #2563EB; }
+    .multi-btn.selected { border-color: #2563EB; background: #2563EB; color: #fff; }
+
+    .free-input {
+      width: 100%; padding: 11px 13px;
+      border: 1.5px solid #E5E7EB; border-radius: 8px;
+      font-size: 13px; font-family: 'Inter', sans-serif; color: #374151;
+      background: #FAFAFA; resize: none; outline: none;
+      transition: border-color 0.15s;
+      margin-bottom: 16px;
+    }
+    .free-input:focus { border-color: #2563EB; }
+
+    .next-btn {
+      width: 100%; padding: 13px;
+      background: #2563EB; color: #fff;
+      border: none; border-radius: 8px;
+      font-size: 14px; font-weight: 600;
+      font-family: 'Inter', sans-serif; cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      margin-top: 4px;
+    }
+    .next-btn:hover { background: #1D4ED8; }
+    .next-btn:active { transform: scale(0.98); }
+
+    .msg-card { background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
     .msg-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-    .avatar { width: 32px; height: 32px; border-radius: 50%; background: #111827; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: white; flex-shrink: 0; }
+    .avatar { width: 32px; height: 32px; border-radius: 50%; background: #2563EB; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: white; flex-shrink: 0; }
     .msg-meta { display: flex; flex-direction: column; }
     .msg-name { font-size: 13px; font-weight: 600; color: #111827; }
     .msg-time { font-size: 11px; color: #9CA3AF; }
-    .msg-text { font-size: 15px; line-height: 1.6; color: #374151; }
-    .calendly-wrap { padding: 0 24px 12px; }
+    .msg-text { font-size: 14px; line-height: 1.6; color: #374151; }
+
     .calendly-btn {
       display: flex; align-items: center; justify-content: center;
-      width: 100%; padding: 15px;
-      background: #111827; color: #fff;
-      border: none; border-radius: 12px;
-      font-size: 15px; font-weight: 600;
+      width: 100%; padding: 14px;
+      background: #2563EB; color: #fff;
+      border: none; border-radius: 8px;
+      font-size: 14px; font-weight: 600;
       font-family: 'Inter', sans-serif;
       cursor: pointer; text-decoration: none;
       transition: background 0.15s, transform 0.1s;
       margin-bottom: 8px;
     }
-    .calendly-btn:hover { background: #1F2937; }
-    .calendly-btn:active { transform: scale(0.98); }
+    .calendly-btn:hover { background: #1D4ED8; }
     .calendly-note { font-size: 12px; color: #9CA3AF; text-align: center; }
-    .undo-wrap { padding: 12px 24px 24px; text-align: center; }
-    .undo-btn { font-size: 13px; font-weight: 500; color: #9CA3AF; background: none; border: none; cursor: pointer; font-family: inherit; }
-    .undo-btn:hover { color: #111827; }
+
+    .undo-wrap { padding: 12px 0 0; text-align: center; }
+    .undo-btn { font-size: 12px; font-weight: 500; color: #9CA3AF; background: none; border: none; cursor: pointer; font-family: inherit; }
+    .undo-btn:hover { color: #374151; }
+
+    .progress { display: flex; gap: 4px; margin-bottom: 20px; }
+    .progress-dot { width: 6px; height: 6px; border-radius: 50%; background: #E5E7EB; transition: background 0.2s; }
+    .progress-dot.active { background: #2563EB; }
+    .progress-dot.done { background: #93C5FD; }
+
+    .thanks-title { font-size: 17px; font-weight: 700; color: #111827; margin-bottom: 8px; }
+    .thanks-text { font-size: 14px; color: #6B7280; line-height: 1.6; margin-bottom: 20px; }
   </style>
 </head>
 <body>
 <div class="wrap">
+  <div class="mac-bar"><div class="mac-dot red"></div><div class="mac-dot yellow"></div><div class="mac-dot green"></div><div class="mac-title">app.the-resident.fr</div></div>
   <div class="card">
     <div class="card-top" id="card-top">
       <div class="loom-title" id="loom-title-txt"></div>
@@ -89,57 +162,159 @@
     </div>
     <div class="sep" id="sep-top" style="display:none"></div>
 
-    <div class="card-question" id="vote-section">
-      <div class="question">Cette approche vous parle ?</div>
+    <!-- ÉCRAN 0 : Question principale -->
+    <div class="section active" id="s0">
+      <div class="question">Vos concurrents gèrent déjà mieux que vous. Passez à The Resident.</div>
       <div class="vote-row">
-        <button class="vote-btn btn-pos" onclick="vote('positive')">Je suis partant</button>
-        <button class="vote-btn" onclick="vote('negative')">Ce n'est pas le moment</button>
+        <button class="vote-btn btn-pos" onclick="startPositive()">Yes, let's go</button>
+        <button class="vote-btn btn-neg" onclick="startNegative()">Je reste où je suis</button>
       </div>
     </div>
 
-    <div class="response-positive" id="response-positive">
-      <div class="msg-wrap">
-        <div class="msg-card">
-          <div class="msg-header">
-            <div class="avatar" id="avatar-pos">K</div>
-            <div class="msg-meta">
-              <span class="msg-name" id="sender-name-pos">Karl</span>
-              <span class="msg-time">À l'instant</span>
-            </div>
-          </div>
-          <div class="msg-text" id="human-msg-pos">Top, merci ! Je vous propose qu'on se parle 10 minutes pour voir si je peux vraiment vous aider. Choisissez le créneau qui vous convient</div>
-        </div>
+    <!-- FLOW POSITIF : P1 Logements -->
+    <div class="section" id="p1">
+      <div class="progress" id="prog-p1"></div>
+      <div class="question">Combien de logements gérez-vous ?</div>
+      <div class="choices" id="p1-choices">
+        <button class="choice-btn" onclick="selectChoice('p1', this, nextP2)">1 – 5</button>
+        <button class="choice-btn" onclick="selectChoice('p1', this, nextP2)">6 – 20</button>
+        <button class="choice-btn" onclick="selectChoice('p1', this, nextP2)">21 – 50</button>
+        <button class="choice-btn" onclick="selectChoice('p1', this, nextP2)">50+</button>
       </div>
-      <div class="calendly-wrap">
-        <a class="calendly-btn" id="calendly-link" href="https://calendly.com/votre-lien" target="_blank">Choisir un créneau</a>
-        <div class="calendly-note">Gratuit · 10 min · Annulable à tout moment</div>
-      </div>
-      <div class="undo-wrap"><button class="undo-btn" onclick="resetVote()">Modifier ma réponse</button></div>
     </div>
 
-    <div class="response-negative" id="response-negative">
-      <div class="msg-wrap">
-        <div class="msg-card">
-          <div class="msg-header">
-            <div class="avatar" id="avatar-neg">K</div>
-            <div class="msg-meta">
-              <span class="msg-name" id="sender-name-neg">Karl</span>
-              <span class="msg-time">À l'instant</span>
-            </div>
-          </div>
-          <div class="msg-text">Pas de souci, je comprends. Merci d'avoir pris le temps — bonne continuation à vous !</div>
-        </div>
+    <!-- FLOW POSITIF : P2 Défi -->
+    <div class="section" id="p2">
+      <div class="progress" id="prog-p2"></div>
+      <div class="question">Qu'est-ce que vous aimeriez booster ?</div>
+      <div class="sub">Plusieurs choix possibles</div>
+      <div class="multi-choices" id="p2-choices">
+        <button class="multi-btn" onclick="toggleMulti(this)">Ma rentabilité</button>
+        <button class="multi-btn" onclick="toggleMulti(this)">Mon taux d'occupation</button>
+        <button class="multi-btn" onclick="toggleMulti(this)">Mon temps libre</button>
+        <button class="multi-btn" onclick="toggleMulti(this)">Ma croissance</button>
       </div>
-      <div class="undo-wrap"><button class="undo-btn" onclick="resetVote()">Modifier ma réponse</button></div>
+      <textarea class="free-input" id="p2-free" placeholder="Autre chose ? Dites-nous..." rows="2"></textarea>
+      <button class="next-btn" onclick="goPositiveResult()">Continuer</button>
     </div>
+
+    <!-- FLOW POSITIF : P3 Résultat -->
+    <div class="section" id="p3">
+      <div class="msg-card">
+        <div class="msg-header">
+          <img src="https://karlroizil.github.io/loom-tracker/IMG_0797.jpeg" style="width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;" alt="Karl"/>
+          <div class="msg-meta">
+            <span class="msg-name" id="sender-name-pos">Karl</span>
+            <span class="msg-time">À l'instant</span>
+          </div>
+        </div>
+        <div class="msg-text" id="human-msg-pos">On analyse ça ensemble en call, c'est gratuit.</div>
+      </div>
+      <a class="calendly-btn" id="calendly-link-pos" href="https://calendly.com/votre-lien" target="_blank">Je réserve mon call</a>
+      <div class="calendly-note">Gratuit · 10 min · Zéro engagement</div>
+      <div class="undo-wrap"><button class="undo-btn" onclick="resetAll()">Modifier ma réponse</button></div>
+    </div>
+
+    <!-- FLOW NÉGATIF : N1 Quel outil -->
+    <div class="section" id="n1">
+      <div class="progress" id="prog-n1"></div>
+      <div class="question">The Resident vous attend — quel outil vous retient en arrière ?</div>
+      <div class="choices" id="n1-choices">
+        <button class="choice-btn" onclick="selectChoice('n1', this, nextN2)">Hostaway</button>
+        <button class="choice-btn" onclick="selectChoice('n1', this, nextN2)">Lodgify</button>
+        <button class="choice-btn" onclick="selectChoice('n1', this, nextN2)">Smoobu</button>
+        <button class="choice-btn" onclick="selectChoice('n1', this, nextN2)">Guesty</button>
+        <button class="choice-btn" onclick="selectChoice('n1', this, nextN2)">Superhote</button>
+        <button class="choice-btn" onclick="selectChoice('n1', this, nextN2)">Autre</button>
+      </div>
+    </div>
+
+    <!-- FLOW NÉGATIF : N2 Complet -->
+    <div class="section" id="n2">
+      <div class="progress" id="prog-n2"></div>
+      <div class="question">Il vous suffit vraiment ?</div>
+      <div class="choices" id="n2-choices">
+        <button class="choice-btn" onclick="selectChoice('n2', this, nextN2b)">Oui, je m'en contente</button>
+        <button class="choice-btn" onclick="selectChoice('n2', this, nextN2b)">Non, il me manque des choses</button>
+      </div>
+    </div>
+
+    <!-- FLOW NÉGATIF : N3 Manques (multi) -->
+    <div class="section" id="n3">
+      <div class="progress" id="prog-n3"></div>
+      <div class="question">Ce que The Resident ferait mieux pour vous :</div>
+      <div class="sub">Plusieurs choix possibles</div>
+      <div class="multi-choices" id="n3-choices">
+        <button class="multi-btn" onclick="toggleMulti(this)">Synchronisation des calendriers</button>
+        <button class="multi-btn" onclick="toggleMulti(this)">Gestion des ménages</button>
+        <button class="multi-btn" onclick="toggleMulti(this)">Communication voyageurs</button>
+        <button class="multi-btn" onclick="toggleMulti(this)">Reporting et statistiques</button>
+        <button class="multi-btn" onclick="toggleMulti(this)">Gestion des tarifs dynamiques</button>
+        <button class="multi-btn" onclick="toggleMulti(this)">Intégration plateformes</button>
+      </div>
+      <textarea class="free-input" id="n3-free" placeholder="Autre chose ? Décrivez en quelques mots..." rows="2"></textarea>
+      <button class="next-btn" onclick="nextN4()">Continuer →</button>
+    </div>
+
+    <!-- FLOW NÉGATIF : N4 Logements -->
+    <div class="section" id="n4">
+      <div class="progress" id="prog-n4"></div>
+      <div class="question">Combien de logements gérez-vous ?</div>
+      <div class="choices" id="n4-choices">
+        <button class="choice-btn" onclick="selectChoice('n4', this, nextN5)">1 – 5</button>
+        <button class="choice-btn" onclick="selectChoice('n4', this, nextN5)">6 – 20</button>
+        <button class="choice-btn" onclick="selectChoice('n4', this, nextN5)">21 – 50</button>
+        <button class="choice-btn" onclick="selectChoice('n4', this, nextN5)">50+</button>
+      </div>
+    </div>
+
+    <!-- FLOW NÉGATIF : N5 Prêt à changer -->
+    <div class="section" id="n5">
+      <div class="progress" id="prog-n5"></div>
+      <div class="question">Prêt(e) à passer un cap ?</div>
+      <div class="choices" id="n5-choices">
+        <button class="choice-btn" onclick="selectChoice('n5', this, nextN6)">Oui</button>
+        <button class="choice-btn" onclick="selectChoice('n5', this, nextN6)">Non</button>
+      </div>
+    </div>
+
+    <!-- FLOW NÉGATIF : N6 Pourquoi -->
+    <div class="section" id="n6">
+      <div class="progress" id="prog-n6"></div>
+      <div class="question">Pourquoi ?</div>
+      <div class="choices" id="n6-choices">
+        <button class="choice-btn" onclick="selectChoice('n6', this, showNegativeResult)">Trop cher</button>
+        <button class="choice-btn" onclick="selectChoice('n6', this, showNegativeResult)">Manque de fonctionnalités</button>
+        <button class="choice-btn" onclick="selectChoice('n6', this, showNegativeResult)">Mauvais support</button>
+        <button class="choice-btn" onclick="selectChoice('n6', this, showNegativeResult)">Trop compliqué</button>
+      </div>
+    </div>
+
+    <!-- FLOW NÉGATIF : N7 Merci + CTA -->
+    <div class="section" id="n7">
+      <div class="msg-card">
+        <div class="msg-header">
+          <img src="https://karlroizil.github.io/loom-tracker/IMG_0797.jpeg" style="width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;" alt="Karl"/>
+          <div class="msg-meta">
+            <span class="msg-name">Karl</span>
+            <span class="msg-time">À l'instant</span>
+          </div>
+        </div>
+        <div class="msg-text">Ce call est gratuit. Testez The Resident et vous vous abonnerez — des milliers de conciergeries ont déjà fait le pas.</div>
+      </div>
+      <a class="calendly-btn" id="calendly-link-neg" href="https://calendly.com/votre-lien" target="_blank">Je réserve quand même</a>
+      <div class="calendly-note">Gratuit · 10 min · Zéro engagement</div>
+      <div class="undo-wrap"><button class="undo-btn" onclick="resetAll()">Modifier ma réponse</button></div>
+    </div>
+
   </div>
 </div>
 
 <script>
-  const FORMSPREE        = "https://hook.eu1.make.com/fskhgw3cij5kqa4vjl58s66e1agkrqut";
-  const DEFAULT_SENDER   = "Karl";
-  const DEFAULT_CALENDLY = "https://calendly.com/votre-lien";
-  const DEFAULT_MSG_POS  = "Top, merci ! Je vous propose qu'on se parle 10 minutes pour voir si je peux vraiment vous aider. Choisissez le créneau qui vous convient";
+  const WEBHOOK         = "https://hook.eu1.make.com/fskhgw3cij5kqa4vjl58s66e1agkrqut";
+  const DEFAULT_SENDER  = "Karl";
+  const DEFAULT_CALENDLY= "https://calendly.com/votre-lien";
+  const DEFAULT_MSG_POS = "On analyse ça ensemble en call, c'est gratuit.";
 
   const p         = new URLSearchParams(location.search);
   const loomId    = p.get("loom")     || "";
@@ -163,31 +338,136 @@
   }
 
   document.getElementById("sender-name-pos").textContent = sender;
-  document.getElementById("sender-name-neg").textContent = sender;
-  document.getElementById("avatar-pos").textContent      = sender.charAt(0).toUpperCase();
-  document.getElementById("avatar-neg").textContent      = sender.charAt(0).toUpperCase();
+  // avatar is now a photo
   document.getElementById("human-msg-pos").textContent   = msgPos;
-  document.getElementById("calendly-link").href          = calendly;
+  document.getElementById("calendly-link-pos").href      = calendly;
+  document.getElementById("calendly-link-neg").href      = calendly;
 
   const views = parseInt(localStorage.getItem(viewKey) || "0") + 1;
   localStorage.setItem(viewKey, views);
 
-  const prev = localStorage.getItem(votedKey);
-  if (prev) showResult(prev);
+  const data = { type:"", logements_pos:"", defi:"", defi_libre:"", outil:"", complet:"", manque:[], manque_libre:"", logements_neg:"", pret_changer:"", pourquoi:"" };
 
-  async function vote(type) {
-    localStorage.setItem(votedKey, type);
-    showResult(type);
+  function show(id) {
+    document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+  }
+
+  function setProgress(id, total, current) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = "";
+    for (let i = 0; i < total; i++) {
+      const d = document.createElement("div");
+      d.className = "progress-dot" + (i < current ? " done" : i === current ? " active" : "");
+      el.appendChild(d);
+    }
+  }
+
+  function selectChoice(group, btn, callback) {
+    document.querySelectorAll("#" + group + "-choices .choice-btn").forEach(b => b.classList.remove("selected"));
+    btn.classList.add("selected");
+    setTimeout(callback, 250);
+  }
+
+  function toggleMulti(btn) { btn.classList.toggle("selected"); }
+
+  // FLOW POSITIF
+  function startPositive() {
+    data.type = "positive";
+    setProgress("prog-p1", 2, 0);
+    show("p1");
+  }
+
+  function nextP2() {
+    data.logements_pos = document.querySelector("#p1-choices .selected").textContent;
+    setProgress("prog-p2", 2, 1);
+    show("p2");
+  }
+
+  function goPositiveResult() {
+    data.defi = Array.from(document.querySelectorAll("#p2-choices .selected")).map(b => b.textContent).join(", ");
+    data.defi_libre = document.getElementById("p2-free").value;
+    show("p3");
+    sendData();
+  }
+
+  function showPositiveResult() {
+    goPositiveResult();
+  }
+
+  // FLOW NÉGATIF
+  function startNegative() {
+    data.type = "negative";
+    setProgress("prog-n1", 6, 0);
+    show("n1");
+  }
+
+  function nextN2() {
+    data.outil = document.querySelector("#n1-choices .selected").textContent;
+    setProgress("prog-n2", 6, 1);
+    show("n2");
+  }
+
+  function nextN2b() {
+    data.complet = document.querySelector("#n2-choices .selected").textContent;
+    if (data.complet.includes("Non")) {
+      setProgress("prog-n3", 6, 2);
+      show("n3");
+    } else {
+      showNegativeResult();
+    }
+  }
+
+  function nextN4() {
+    data.manque = Array.from(document.querySelectorAll("#n3-choices .selected")).map(b => b.textContent);
+    data.manque_libre = document.getElementById("n3-free").value;
+    setProgress("prog-n4", 6, 3);
+    show("n4");
+  }
+
+  function nextN5() {
+    data.logements_neg = document.querySelector("#n4-choices .selected").textContent;
+    showNegativeResult();
+  }
+
+  function nextN6() {
+    data.pret_changer = document.querySelector("#n5-choices .selected").textContent;
+    if (data.pret_changer === "Oui") {
+      setProgress("prog-n6", 6, 5);
+      show("n6");
+    } else {
+      showNegativeResult();
+    }
+  }
+
+  function showNegativeResult() {
+    const n6selected = document.querySelector("#n6-choices .selected");
+    data.pourquoi = n6selected ? n6selected.textContent : "";
+    show("n7");
+    sendData();
+  }
+
+  async function sendData() {
+    localStorage.setItem(votedKey, data.type);
     try {
-      await fetch(FORMSPREE, {
+      await fetch(WEBHOOK, {
         method: "POST",
         headers: { "Content-Type": "application/json", "Accept": "application/json" },
         body: JSON.stringify({
-          "Nom du prospect": prospect || "Inconnu",
-          "Lien LOOM": "https://www.loom.com/share/" + (loomId || "-"),
-          "Réponse": type === "positive" ? "Je suis partant" : "Ce n'est pas le moment",
-          "Vues": views,
-          "Date": new Date().toLocaleDateString("fr-FR")
+          "Nom du prospect"  : prospect || "Inconnu",
+          "Lien LOOM"        : "https://www.loom.com/share/" + (loomId || "-"),
+          "Réponse"          : data.type === "positive" ? "Je suis partant" : "J'utilise déjà un outil",
+          "Logements"        : data.type === "positive" ? data.logements_pos : data.logements_neg,
+          "Défi principal"   : data.defi + (data.defi_libre ? " — " + data.defi_libre : ""),
+          "Outil actuel"     : data.outil,
+          "Outil complet"    : data.complet,
+          "Ce qui manque"    : data.manque.join(", "),
+          "Autre manque"     : data.manque_libre,
+          "Prêt à changer"   : data.pret_changer,
+          "Pourquoi"         : data.pourquoi,
+          "Vues"             : views,
+          "Date"             : new Date().toLocaleDateString("fr-FR")
         })
       });
     } catch(e) {
@@ -195,17 +475,13 @@
     }
   }
 
-  function showResult(type) {
-    document.getElementById("vote-section").style.display      = "none";
-    document.getElementById("response-positive").style.display = type === "positive" ? "block" : "none";
-    document.getElementById("response-negative").style.display = type === "negative" ? "block" : "none";
-  }
-
-  function resetVote() {
+  function resetAll() {
     localStorage.removeItem(votedKey);
-    document.getElementById("vote-section").style.display      = "block";
-    document.getElementById("response-positive").style.display = "none";
-    document.getElementById("response-negative").style.display = "none";
+    Object.keys(data).forEach(k => { data[k] = k === "manque" ? [] : ""; });
+    document.querySelectorAll(".choice-btn, .multi-btn").forEach(b => b.classList.remove("selected"));
+    document.getElementById("n3-free").value = "";
+    document.getElementById("p2-free").value = "";
+    show("s0");
   }
 </script>
 </body>
