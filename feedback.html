@@ -338,7 +338,6 @@
   }
 
   document.getElementById("sender-name-pos").textContent = sender;
-  // avatar is now a photo
   document.getElementById("human-msg-pos").textContent   = msgPos;
   document.getElementById("calendly-link-pos").href      = calendly;
   document.getElementById("calendly-link-neg").href      = calendly;
@@ -458,6 +457,7 @@
           "Nom du prospect"  : prospect || "Inconnu",
           "Lien LOOM"        : "https://www.loom.com/share/" + (loomId || "-"),
           "Réponse"          : data.type === "positive" ? "Je suis partant" : "J'utilise déjà un outil",
+          "Statut"           : data.type === "positive" ? "En cours" : data.complet === "Oui, je m'en contente" ? "Perdu" : "À contacter",
           "Logements"        : data.type === "positive" ? data.logements_pos : data.logements_neg,
           "Défi principal"   : data.defi + (data.defi_libre ? " — " + data.defi_libre : ""),
           "Outil actuel"     : data.outil,
