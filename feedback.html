@@ -427,7 +427,8 @@
 
   function nextN5() {
     data.logements_neg = document.querySelector("#n4-choices .selected").textContent;
-    showNegativeResult();
+    setProgress("prog-n5", 6, 4);
+    show("n5");
   }
 
   function nextN6() {
