@@ -20,7 +20,6 @@
     }
     .wrap { width: 100%; max-width: 620px; }
 
-    /* Mac window chrome */
     .mac-bar {
       background: #D0D3D8;
       padding: 10px 16px;
@@ -105,6 +104,17 @@
     }
     .free-input:focus { border-color: #2563EB; }
 
+    .email-input {
+      width: 100%; padding: 13px 15px;
+      border: 1.5px solid #E5E7EB; border-radius: 8px;
+      font-size: 14px; font-family: 'Inter', sans-serif; color: #374151;
+      background: #FAFAFA; outline: none;
+      transition: border-color 0.15s;
+      margin-bottom: 12px;
+    }
+    .email-input:focus { border-color: #2563EB; }
+    .email-error { font-size: 12px; color: #EF4444; margin-bottom: 12px; display: none; }
+
     .next-btn {
       width: 100%; padding: 13px;
       background: #2563EB; color: #fff;
@@ -117,9 +127,10 @@
     .next-btn:hover { background: #1D4ED8; }
     .next-btn:active { transform: scale(0.98); }
 
+    .privacy-note { font-size: 11px; color: #9CA3AF; text-align: center; margin-top: 10px; }
+
     .msg-card { background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
     .msg-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-    .avatar { width: 32px; height: 32px; border-radius: 50%; background: #2563EB; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: white; flex-shrink: 0; }
     .msg-meta { display: flex; flex-direction: column; }
     .msg-name { font-size: 13px; font-weight: 600; color: #111827; }
     .msg-time { font-size: 11px; color: #9CA3AF; }
@@ -147,9 +158,6 @@
     .progress-dot { width: 6px; height: 6px; border-radius: 50%; background: #E5E7EB; transition: background 0.2s; }
     .progress-dot.active { background: #2563EB; }
     .progress-dot.done { background: #93C5FD; }
-
-    .thanks-title { font-size: 17px; font-weight: 700; color: #111827; margin-bottom: 8px; }
-    .thanks-text { font-size: 14px; color: #6B7280; line-height: 1.6; margin-bottom: 20px; }
   </style>
 </head>
 <body>
@@ -162,8 +170,23 @@
     </div>
     <div class="sep" id="sep-top" style="display:none"></div>
 
+    <!-- ÉTAPE EMAIL -->
+    <div class="section active" id="s-email">
+      <div class="question">Confirmez votre email pour accéder au contenu ✉️</div>
+      <input
+        class="email-input"
+        id="email-field"
+        type="email"
+        autocomplete="email"
+        placeholder="votre@email.com"
+      />
+      <div class="email-error" id="email-error">Veuillez saisir un email valide.</div>
+      <button class="next-btn" onclick="submitEmail()">Continuer →</button>
+      <p class="privacy-note">🔒 Utilisé uniquement pour personnaliser votre expérience.</p>
+    </div>
+
     <!-- ÉCRAN 0 : Question principale -->
-    <div class="section active" id="s0">
+    <div class="section" id="s0">
       <div class="question">Vos concurrents gèrent déjà mieux que vous. Passez à The Resident.</div>
       <div class="vote-row">
         <button class="vote-btn btn-pos" onclick="startPositive()">Yes, let's go</button>
@@ -327,6 +350,8 @@
   const viewKey  = "loom_views_"  + (loomId || "demo");
   const votedKey = "loom_voted_"  + (loomId || "demo");
 
+  let prospectEmail = ""; // rempli par le prospect lui-même
+
   if (prospect || loomTitle) {
     const title = prospect && loomTitle ? "Pour " + prospect + " — " + loomTitle
                 : prospect ? prospect : loomTitle;
@@ -339,14 +364,37 @@
 
   document.getElementById("sender-name-pos").textContent = sender;
   document.getElementById("human-msg-pos").textContent   = msgPos;
-  const calendlyWithName = prospect ? calendly + "?name=" + encodeURIComponent(prospect) : calendly;
-  document.getElementById("calendly-link-pos").href      = calendlyWithName;
-  document.getElementById("calendly-link-neg").href      = calendlyWithName;
 
   const views = parseInt(localStorage.getItem(viewKey) || "0") + 1;
   localStorage.setItem(viewKey, views);
 
   const data = { type:"", logements_pos:"", defi:"", defi_libre:"", outil:"", complet:"", manque:[], manque_libre:"", logements_neg:"", pret_changer:"", pourquoi:"" };
+
+  function updateCalendlyLinks() {
+    let url = calendly;
+    if (prospect) url += "?name=" + encodeURIComponent(prospect);
+    if (prospectEmail) url += (prospect ? "&" : "?") + "email=" + encodeURIComponent(prospectEmail);
+    document.getElementById("calendly-link-pos").href = url;
+    document.getElementById("calendly-link-neg").href = url;
+  }
+
+  function submitEmail() {
+    const val = document.getElementById("email-field").value.trim();
+    const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+    const errEl = document.getElementById("email-error");
+    if (!valid) {
+      errEl.style.display = "block";
+      return;
+    }
+    errEl.style.display = "none";
+    prospectEmail = val;
+    updateCalendlyLinks();
+    show("s0");
+  }
+
+  document.getElementById("email-field").addEventListener("keydown", function(e) {
+    if (e.key === "Enter") submitEmail();
+  });
 
   function show(id) {
     document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
@@ -372,7 +420,6 @@
 
   function toggleMulti(btn) { btn.classList.toggle("selected"); }
 
-  // FLOW POSITIF
   function startPositive() {
     data.type = "positive";
     setProgress("prog-p1", 2, 0);
@@ -392,11 +439,6 @@
     sendData();
   }
 
-  function showPositiveResult() {
-    goPositiveResult();
-  }
-
-  // FLOW NÉGATIF
   function startNegative() {
     data.type = "negative";
     setProgress("prog-n1", 6, 0);
@@ -456,7 +498,8 @@
         method: "POST",
         headers: { "Content-Type": "application/json", "Accept": "application/json" },
         body: JSON.stringify({
-          "prospect"  : prospect || "Inconnu",
+          "prospect"         : prospect || "Inconnu",
+          "Email"            : prospectEmail || "",
           "Lien LOOM"        : "https://www.loom.com/share/" + (loomId || "-"),
           "Réponse"          : data.type === "positive" ? "Je suis partant" : "J'utilise déjà un outil",
           "Logements"        : data.type === "positive" ? data.logements_pos : data.logements_neg,
@@ -478,11 +521,13 @@
 
   function resetAll() {
     localStorage.removeItem(votedKey);
+    prospectEmail = "";
     Object.keys(data).forEach(k => { data[k] = k === "manque" ? [] : ""; });
     document.querySelectorAll(".choice-btn, .multi-btn").forEach(b => b.classList.remove("selected"));
     document.getElementById("n3-free").value = "";
     document.getElementById("p2-free").value = "";
-    show("s0");
+    document.getElementById("email-field").value = "";
+    show("s-email");
   }
 </script>
 </body>
