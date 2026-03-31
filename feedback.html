@@ -339,8 +339,9 @@
 
   document.getElementById("sender-name-pos").textContent = sender;
   document.getElementById("human-msg-pos").textContent   = msgPos;
-  document.getElementById("calendly-link-pos").href      = calendly;
-  document.getElementById("calendly-link-neg").href      = calendly;
+  const calendlyWithName = prospect ? calendly + "?name=" + encodeURIComponent(prospect) : calendly;
+  document.getElementById("calendly-link-pos").href      = calendlyWithName;
+  document.getElementById("calendly-link-neg").href      = calendlyWithName;
 
   const views = parseInt(localStorage.getItem(viewKey) || "0") + 1;
   localStorage.setItem(viewKey, views);
