@@ -65,7 +65,6 @@
       font-family: 'Inter', sans-serif; text-align: center;
       transition: all 0.15s;
     }
-    .vote-btn:hover { border-color: #2563EB; background: #EFF6FF; color: #2563EB; }
     .vote-btn:active { transform: scale(0.97); }
     .vote-btn.btn-pos:hover { border-color: #2563EB; background: #EFF6FF; color: #2563EB; }
     .vote-btn.btn-neg:hover { border-color: #6B7280; background: #F9FAFB; color: #374151; }
@@ -158,11 +157,36 @@
     .progress-dot { width: 6px; height: 6px; border-radius: 50%; background: #E5E7EB; transition: background 0.2s; }
     .progress-dot.active { background: #2563EB; }
     .progress-dot.done { background: #93C5FD; }
+
+    /* ── Debug banner (visible uniquement si ?debug=1) ── */
+    #debug-banner {
+      display: none;
+      background: #1e1e2e;
+      color: #a6e3a1;
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      white-space: pre-wrap;
+      word-break: break-all;
+      border: 1px solid #313244;
+    }
+    #debug-banner.visible { display: block; }
   </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="mac-bar"><div class="mac-dot red"></div><div class="mac-dot yellow"></div><div class="mac-dot green"></div><div class="mac-title">app.the-resident.fr</div></div>
+
+  <!-- Debug banner — visible uniquement avec ?debug=1 dans l'URL -->
+  <div id="debug-banner"></div>
+
+  <div class="mac-bar">
+    <div class="mac-dot red"></div>
+    <div class="mac-dot yellow"></div>
+    <div class="mac-dot green"></div>
+    <div class="mac-title">app.the-resident.fr</div>
+  </div>
   <div class="card">
     <div class="card-top" id="card-top">
       <div class="loom-title" id="loom-title-txt"></div>
@@ -173,13 +197,7 @@
     <!-- ÉTAPE EMAIL -->
     <div class="section active" id="s-email">
       <div class="question">Confirmez votre email pour accéder au contenu ✉️</div>
-      <input
-        class="email-input"
-        id="email-field"
-        type="email"
-        autocomplete="email"
-        placeholder="votre@email.com"
-      />
+      <input class="email-input" id="email-field" type="email" autocomplete="email" placeholder="votre@email.com"/>
       <div class="email-error" id="email-error">Veuillez saisir un email valide.</div>
       <button class="next-btn" onclick="submitEmail()">Continuer →</button>
       <p class="privacy-note">🔒 Utilisé uniquement pour personnaliser votre expérience.</p>
@@ -330,31 +348,48 @@
       <div class="undo-wrap"><button class="undo-btn" onclick="resetAll()">Modifier ma réponse</button></div>
     </div>
 
-  </div>
-</div>
+  </div><!-- /.card -->
+</div><!-- /.wrap -->
 
 <script>
-  const WEBHOOK         = "https://hook.eu1.make.com/fskhgw3cij5kqa4vjl58s66e1agkrqut";
-  const DEFAULT_SENDER  = "Karl";
-  const DEFAULT_CALENDLY= "https://calendly.com/karlroizilpro/appel-avec-karl-the-resident";
-  const DEFAULT_MSG_POS = "On analyse ça ensemble en call, c'est gratuit.";
+  // ─── CONFIG ───────────────────────────────────────────────────────────────
+  const WEBHOOK          = "https://hook.eu1.make.com/fskhgw3cij5kqa4vjl58s66e1agkrqut";
+  const DEFAULT_SENDER   = "Karl";
+  const DEFAULT_CALENDLY = "https://calendly.com/karlroizilpro/appel-avec-karl-the-resident";
+  const DEFAULT_MSG_POS  = "On analyse ça ensemble en call, c'est gratuit.";
 
-  const p         = new URLSearchParams(location.search);
-  const loomId    = p.get("loom")     || "";
-  const loomTitle = p.get("title")    ? decodeURIComponent(p.get("title"))    : "";
-  const prospect  = p.get("prospect") ? decodeURIComponent(p.get("prospect")) : "";
-  const sender    = p.get("sender")   ? decodeURIComponent(p.get("sender"))   : DEFAULT_SENDER;
-  const calendly  = p.get("calendly") ? decodeURIComponent(p.get("calendly")) : DEFAULT_CALENDLY;
-  const msgPos    = p.get("msg")      ? decodeURIComponent(p.get("msg"))      : DEFAULT_MSG_POS;
+  // ─── PARAMS URL ───────────────────────────────────────────────────────────
+  // Usage :
+  //   feedback.html
+  //     ?prospect=Sophie+Martin        ← NOM du prospect (affiché + envoyé)
+  //     &entreprise=Conciergerie+Nice  ← ENTREPRISE du prospect  ← NOUVEAU
+  //     &loom=abc123                   ← ID du Loom (ex: loom.com/share/abc123)
+  //     &title=Présentation+The+Resident
+  //     &sender=Karl
+  //     &calendly=https://...
+  //     &msg=Votre+message+perso
+  //     &debug=1                       ← affiche le payload envoyé (dev only)
+  const p          = new URLSearchParams(location.search);
+  const loomId     = p.get("loom")       || "";
+  const loomTitle  = p.get("title")      ? decodeURIComponent(p.get("title"))      : "";
+  const prospect   = p.get("prospect")   ? decodeURIComponent(p.get("prospect"))   : "";
+  const entreprise = p.get("entreprise") ? decodeURIComponent(p.get("entreprise")) : ""; // ← NOUVEAU
+  const sender     = p.get("sender")     ? decodeURIComponent(p.get("sender"))     : DEFAULT_SENDER;
+  const calendly   = p.get("calendly")   ? decodeURIComponent(p.get("calendly"))   : DEFAULT_CALENDLY;
+  const msgPos     = p.get("msg")        ? decodeURIComponent(p.get("msg"))        : DEFAULT_MSG_POS;
+  const debugMode  = p.get("debug") === "1";
 
+  // ─── CLÉS LOCALSTORAGE ────────────────────────────────────────────────────
   const viewKey  = "loom_views_"  + (loomId || "demo");
   const votedKey = "loom_voted_"  + (loomId || "demo");
 
-  let prospectEmail = ""; // rempli par le prospect lui-même
+  let prospectEmail = "";
 
+  // ─── EN-TÊTE DE CARTE ─────────────────────────────────────────────────────
   if (prospect || loomTitle) {
-    const title = prospect && loomTitle ? "Pour " + prospect + " — " + loomTitle
-                : prospect ? prospect : loomTitle;
+    const title = prospect && loomTitle
+      ? "Pour " + prospect + " — " + loomTitle
+      : prospect ? prospect : loomTitle;
     document.getElementById("loom-title-txt").textContent = title;
     document.getElementById("loom-date-txt").textContent  = "Reçu le " + new Date().toLocaleDateString("fr-FR", {day:"numeric",month:"long",year:"numeric"});
     document.getElementById("sep-top").style.display = "block";
@@ -365,37 +400,42 @@
   document.getElementById("sender-name-pos").textContent = sender;
   document.getElementById("human-msg-pos").textContent   = msgPos;
 
+  // ─── COMPTEUR DE VUES ─────────────────────────────────────────────────────
   const views = parseInt(localStorage.getItem(viewKey) || "0") + 1;
   localStorage.setItem(viewKey, views);
 
-  const data = { type:"", logements_pos:"", defi:"", defi_libre:"", outil:"", complet:"", manque:[], manque_libre:"", logements_neg:"", pret_changer:"", pourquoi:"" };
+  // ─── DONNÉES COLLECTÉES ───────────────────────────────────────────────────
+  const data = {
+    type: "", logements_pos: "", defi: "", defi_libre: "",
+    outil: "", complet: "", manque: [], manque_libre: "",
+    logements_neg: "", pret_changer: "", pourquoi: ""
+  };
 
+  // ─── LIENS CALENDLY ───────────────────────────────────────────────────────
   function updateCalendlyLinks() {
     let url = calendly;
-    if (prospect) url += "?name=" + encodeURIComponent(prospect);
-    if (prospectEmail) url += (prospect ? "&" : "?") + "email=" + encodeURIComponent(prospectEmail);
+    const params = [];
+    if (prospect)      params.push("name="  + encodeURIComponent(prospect));
+    if (prospectEmail) params.push("email=" + encodeURIComponent(prospectEmail));
+    if (params.length) url += "?" + params.join("&");
     document.getElementById("calendly-link-pos").href = url;
     document.getElementById("calendly-link-neg").href = url;
   }
 
+  // ─── EMAIL ────────────────────────────────────────────────────────────────
   function submitEmail() {
-    const val = document.getElementById("email-field").value.trim();
+    const val   = document.getElementById("email-field").value.trim();
     const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
     const errEl = document.getElementById("email-error");
-    if (!valid) {
-      errEl.style.display = "block";
-      return;
-    }
+    if (!valid) { errEl.style.display = "block"; return; }
     errEl.style.display = "none";
     prospectEmail = val;
     updateCalendlyLinks();
     show("s0");
   }
+  document.getElementById("email-field").addEventListener("keydown", e => { if (e.key === "Enter") submitEmail(); });
 
-  document.getElementById("email-field").addEventListener("keydown", function(e) {
-    if (e.key === "Enter") submitEmail();
-  });
-
+  // ─── NAVIGATION ───────────────────────────────────────────────────────────
   function show(id) {
     document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
     document.getElementById(id).classList.add("active");
@@ -420,37 +460,35 @@
 
   function toggleMulti(btn) { btn.classList.toggle("selected"); }
 
+  // ─── FLOW POSITIF ─────────────────────────────────────────────────────────
   function startPositive() {
     data.type = "positive";
     setProgress("prog-p1", 2, 0);
     show("p1");
   }
-
   function nextP2() {
     data.logements_pos = document.querySelector("#p1-choices .selected").textContent;
     setProgress("prog-p2", 2, 1);
     show("p2");
   }
-
   function goPositiveResult() {
-    data.defi = Array.from(document.querySelectorAll("#p2-choices .selected")).map(b => b.textContent).join(", ");
+    data.defi       = Array.from(document.querySelectorAll("#p2-choices .selected")).map(b => b.textContent).join(", ");
     data.defi_libre = document.getElementById("p2-free").value;
     show("p3");
     sendData();
   }
 
+  // ─── FLOW NÉGATIF ─────────────────────────────────────────────────────────
   function startNegative() {
     data.type = "negative";
     setProgress("prog-n1", 6, 0);
     show("n1");
   }
-
   function nextN2() {
     data.outil = document.querySelector("#n1-choices .selected").textContent;
     setProgress("prog-n2", 6, 1);
     show("n2");
   }
-
   function nextN2b() {
     data.complet = document.querySelector("#n2-choices .selected").textContent;
     if (data.complet.includes("Non")) {
@@ -460,20 +498,17 @@
       showNegativeResult();
     }
   }
-
   function nextN4() {
-    data.manque = Array.from(document.querySelectorAll("#n3-choices .selected")).map(b => b.textContent);
+    data.manque       = Array.from(document.querySelectorAll("#n3-choices .selected")).map(b => b.textContent);
     data.manque_libre = document.getElementById("n3-free").value;
     setProgress("prog-n4", 6, 3);
     show("n4");
   }
-
   function nextN5() {
     data.logements_neg = document.querySelector("#n4-choices .selected").textContent;
     setProgress("prog-n5", 6, 4);
     show("n5");
   }
-
   function nextN6() {
     data.pret_changer = document.querySelector("#n5-choices .selected").textContent;
     if (data.pret_changer === "Oui") {
@@ -483,49 +518,71 @@
       showNegativeResult();
     }
   }
-
   function showNegativeResult() {
-    const n6selected = document.querySelector("#n6-choices .selected");
-    data.pourquoi = n6selected ? n6selected.textContent : "";
+    const n6sel   = document.querySelector("#n6-choices .selected");
+    data.pourquoi = n6sel ? n6sel.textContent : "";
     show("n7");
     sendData();
   }
 
+  // ─── ENVOI WEBHOOK ────────────────────────────────────────────────────────
+  // Les clés correspondent EXACTEMENT aux noms de colonnes Airtable
+  // et aux champs mappés dans Make.
   async function sendData() {
     localStorage.setItem(votedKey, data.type);
+
+    const payload = {
+      "prospect"        : prospect      || "Inconnu",
+      "Email"           : prospectEmail || "",
+      "Entreprise"      : entreprise    || "",          // ← NOUVEAU champ
+      "Lien LOOM"       : loomId ? "https://www.loom.com/share/" + loomId : "",
+      "Réponse"         : data.type === "positive" ? "Je suis partant" : "J'utilise déjà un outil",
+      "Logements"       : data.type === "positive" ? data.logements_pos : data.logements_neg,
+      "Défi principal"  : data.defi + (data.defi_libre ? " — " + data.defi_libre : ""),
+      "Outil actuel"    : data.outil,
+      "Outil complet"   : data.complet,
+      "Ce qui manque"   : data.manque.join(", "),
+      "Autre manque"    : data.manque_libre,
+      "Prêt à changer"  : data.pret_changer,
+      "Pourquoi"        : data.pourquoi,
+      "Vues"            : views,
+      "Date"            : new Date().toLocaleDateString("fr-FR")
+    };
+
+    // ── Mode debug ──────────────────────────────────────────────────────────
+    if (debugMode) {
+      const banner = document.getElementById("debug-banner");
+      banner.classList.add("visible");
+      banner.textContent = "📦 Payload envoyé au webhook :\n" + JSON.stringify(payload, null, 2);
+    }
+
     try {
-      await fetch(WEBHOOK, {
-        method: "POST",
+      const res = await fetch(WEBHOOK, {
+        method : "POST",
         headers: { "Content-Type": "application/json", "Accept": "application/json" },
-        body: JSON.stringify({
-          "prospect"         : prospect || "Inconnu",
-          "Email"            : prospectEmail || "",
-          "Lien LOOM"        : "https://www.loom.com/share/" + (loomId || "-"),
-          "Réponse"          : data.type === "positive" ? "Je suis partant" : "J'utilise déjà un outil",
-          "Logements"        : data.type === "positive" ? data.logements_pos : data.logements_neg,
-          "Défi principal"   : data.defi + (data.defi_libre ? " — " + data.defi_libre : ""),
-          "Outil actuel"     : data.outil,
-          "Outil complet"    : data.complet,
-          "Ce qui manque"    : data.manque.join(", "),
-          "Autre manque"     : data.manque_libre,
-          "Prêt à changer"   : data.pret_changer,
-          "Pourquoi"         : data.pourquoi,
-          "Vues"             : views,
-          "Date"             : new Date().toLocaleDateString("fr-FR")
-        })
+        body   : JSON.stringify(payload)
       });
+      if (debugMode) {
+        const banner = document.getElementById("debug-banner");
+        banner.textContent += "\n\n✅ Réponse Make : HTTP " + res.status;
+      }
     } catch(e) {
       console.error("Webhook error:", e);
+      if (debugMode) {
+        const banner = document.getElementById("debug-banner");
+        banner.textContent += "\n\n❌ Erreur : " + e.message;
+      }
     }
   }
 
+  // ─── RESET ────────────────────────────────────────────────────────────────
   function resetAll() {
     localStorage.removeItem(votedKey);
     prospectEmail = "";
     Object.keys(data).forEach(k => { data[k] = k === "manque" ? [] : ""; });
     document.querySelectorAll(".choice-btn, .multi-btn").forEach(b => b.classList.remove("selected"));
-    document.getElementById("n3-free").value = "";
-    document.getElementById("p2-free").value = "";
+    document.getElementById("n3-free").value  = "";
+    document.getElementById("p2-free").value  = "";
     document.getElementById("email-field").value = "";
     show("s-email");
   }
